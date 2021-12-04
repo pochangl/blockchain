@@ -20,5 +20,13 @@ def test_last_hash():
 
 
 def test_difficulty():
-    assert genesis.hash[:DIFFICULTY] == '0000'
-    assert block1.hash[:DIFFICULTY] == '0000'
+    assert genesis.hash[:genesis.difficulty] == '0000'
+    assert block1.hash[:block1.difficulty] == '0' * block1.difficulty
+
+
+def test_dynamic_difficulty():
+    block1 = Block.mine_block(genesis, 'abc')
+    block2 = Block.mine_block(block1, 'abc')
+    assert genesis.difficulty == 4
+    assert block1.difficulty == 3
+    assert block2.difficulty == 4

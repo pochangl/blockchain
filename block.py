@@ -5,14 +5,17 @@ hash = hashlib.sha256()
 
 DIFFICULTY = 4
 
+MINE_RATE = 3 * 10**9
+
 
 class Block:
-    def __init__(self, timestamp: int, last_hash: str, hash: str, data: str, nonce: int):
+    def __init__(self, timestamp: int, last_hash: str, hash: str, data: str, nonce: int, difficulty: int):
         self.timestamp = timestamp
         self.last_hash = last_hash
         self.hash = hash
         self.data = data
         self.nonce = nonce
+        self.difficulty = difficulty
 
     timestamp: int
     last_hash: str
@@ -27,47 +30,62 @@ class Block:
         Hash: {hash}
         data: {data}
         nonce: {nonce}
+        difficulty: {difficulty}
         '''.format(**self.serialize())
 
     @classmethod
     def genesis(cls):
         g = cls(
-            0, '', '', [], 0)
+            0, '', '', [], 0, difficulty=DIFFICULTY)
         g.mine()
         return g
-
-    def mine(self):
-        while True:
-            self.hash = self.get_hash()
-            if (self.hash[:DIFFICULTY] == '0' * DIFFICULTY):
-                break
-            self.nonce += 1
 
     @classmethod
     def mine_block(cls, last_block: 'Block', data: str):
         nonce = 0
+        timestamp = time.time_ns()
+        difficulty = Block.adjust_difficulty(last_block, timestamp)
+        print(last_block.difficulty, difficulty)
         block = cls(
             nonce=nonce,
             timestamp=time.time_ns(),
             last_hash=last_block.hash,
             hash='',
             data=data,
+            difficulty=difficulty,
         )
         block.mine()
         return block
 
     @classmethod
+    def adjust_difficulty(cls, last_block: 'Block', current_time: int) -> int:
+        if (last_block.timestamp + MINE_RATE > current_time):
+            return last_block.difficulty + 1
+        else:
+            return last_block.difficulty - 1
+
+    @classmethod
     def hash(cls, **kwargs):
-        data = '{timestamp}{last_hash}{data}{nonce}'.format(**kwargs)
+        data = '{timestamp}{last_hash}{data}{nonce}{difficulty}'.format(
+            **kwargs)
         m = hashlib.sha256()
         m.update(data.encode())
         return m.hexdigest()
+
+    def mine(self):
+        while True:
+            self.hash = self.get_hash()
+            if (self.hash[:self.difficulty] == '0' * self.difficulty):
+                break
+            self.nonce += 1
 
     def __eq__(self, block: 'Block'):
         return self.serialize() == block.serialize()
 
     def get_hash(self):
-        return Block.hash(timestamp=self.timestamp, last_hash=self.last_hash, data=self.data, nonce=self.nonce)
+        data = self.serialize()
+        data.pop('hash')
+        return Block.hash(**data)
 
     def serialize(self) -> dict:
         return dict(
@@ -76,4 +94,5 @@ class Block:
             hash=self.hash,
             data=self.data,
             nonce=self.nonce,
+            difficulty=self.difficulty,
         )
