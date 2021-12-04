@@ -20,7 +20,7 @@ async def post_mine(request: web.Request):
     blockchain.add_block(data)
     loop = asyncio.get_event_loop()
     syncAllChain()
-    return web.HTTPTemporaryRedirect('/blocks')
+    return await get_blocks(request)
 
 
 sockets = []
@@ -32,7 +32,7 @@ async def syncChain(ws: web.WebSocketResponse):
 
 
 def syncAllChain():
-    loop  = asyncio.get_event_loop()
+    loop = asyncio.get_event_loop()
     for socket in sockets:
         loop.create_task(syncChain(socket))
 
