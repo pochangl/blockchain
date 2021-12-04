@@ -1,7 +1,4 @@
-from block import Block
+from wallet import Wallet
 
-genesis = Block.genesis()
-print(genesis)
-
-m = Block.mine_block(last_block=genesis, data='data')
-print(m)
+wallet = Wallet()
+print(wallet)

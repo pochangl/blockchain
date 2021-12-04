@@ -1,3 +1,4 @@
 websockets
 aiohttp
 pytest
+secp256k1

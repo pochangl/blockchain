@@ -1,11 +1,8 @@
 import hashlib
 import time
+from settings import DIFFICULTY, MINE_RATE
 
 hash = hashlib.sha256()
-
-DIFFICULTY = 4
-
-MINE_RATE = 3 * 10**9
 
 
 class Block:
