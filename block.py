@@ -1,4 +1,7 @@
+import hashlib
 import time
+
+hash = hashlib.sha256()
 
 
 class Block:
@@ -29,5 +32,12 @@ class Block:
     def mine_block(cls, last_block: 'Block', data: str):
         timestamp = time.time_ns()
         last_hash = last_block.hash
-        hash = 'todo-hash'
+        hash = Block.hash(timestamp=timestamp, last_hash=last_hash, data=data)
         return cls(timestamp=timestamp, last_hash=last_hash, hash=hash, data=data)
+
+    @classmethod
+    def hash(cls, **kwargs):
+        data = '{timestamp}{last_hash}{data}'.format(**kwargs)
+        m = hashlib.sha256()
+        m.update(data.encode())
+        return m.hexdigest()
