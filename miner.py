@@ -18,11 +18,23 @@ async def post_mine(request: web.Request):
     json = await request.json()
     data = json['data']
     blockchain.add_block(data)
+    loop = asyncio.get_event_loop()
+    syncAllChain()
     return web.HTTPTemporaryRedirect('/blocks')
 
 
 sockets = []
 ports = []
+
+
+async def syncChain(ws: web.WebSocketResponse):
+    await ws.send_json(dict(type='blocks', data=blockchain.serialize()))
+
+
+def syncAllChain():
+    loop  = asyncio.get_event_loop()
+    for socket in sockets:
+        loop.create_task(syncChain(socket))
 
 
 async def get_messages(ws: web.WebSocketResponse):
@@ -40,7 +52,7 @@ async def process_message(ws: web.WebSocketResponse, message: WSMessage):
     content = json.loads(message.data)
     print(content)
     if content['type'] == 'sync':
-        await ws.send_json(dict(type='blocks', data=blockchain.serialize()))
+        await syncChain(ws)
     elif content['type'] == 'blocks':
         newblock = Blockchain(content['data'])
         blockchain.replace_chain(newblock)
