@@ -2,8 +2,11 @@ from block import Block
 
 
 class Blockchain:
-    def __init__(self):
-        self.chain = [Block.genesis()]
+    def __init__(self, data=None):
+        if data is not None:
+            self.chain = self.deserialize(data)
+        else:
+            self.chain = [Block.genesis()]
 
     chain: list
 
@@ -21,8 +24,6 @@ class Blockchain:
         self.chain.append(block)
 
     def is_valid_chain(self, chain2: 'Blockchain') -> bool:
-        print('testing')
-
         if chain2.genesis != Block.genesis():
             return False
 
@@ -51,3 +52,9 @@ class Blockchain:
                 return False
 
         return True
+
+    def serialize(self) -> list:
+        return list(block.serialize() for block in self.chain)
+
+    def deserialize(self, data: list) -> list:
+        return list([Block(**d) for d in data])

@@ -47,3 +47,11 @@ class Block:
 
     def get_hash(self):
         return Block.hash(timestamp=self.timestamp, last_hash=self.last_hash, data=self.data)
+
+    def serialize(self) -> dict:
+        return dict(
+            timestamp=self.timestamp,
+            last_hash=self.last_hash,
+            hash=self.hash,
+            data=self.data,
+        )

@@ -75,3 +75,11 @@ def test_does_not_replace_chain_with_equal_length():
     bc1.replace_chain(bc2)
 
     assert bc1 != bc2
+
+
+def test_serialize_deserialize():
+    bc1 = Blockchain()
+
+    bc2 = Blockchain(bc1.serialize())
+
+    assert bc1 == bc2
