@@ -3,6 +3,8 @@ import time
 
 hash = hashlib.sha256()
 
+DIFFICULTY = 4
+
 
 class Block:
     def __init__(self, timestamp: int, last_hash: str, hash: str, data: str, nonce: int):
@@ -29,16 +31,30 @@ class Block:
 
     @classmethod
     def genesis(cls):
-        return cls(0, '', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', [], 0)
+        g = cls(
+            0, '', '', [], 0)
+        g.mine()
+        return g
+
+    def mine(self):
+        while True:
+            self.hash = self.get_hash()
+            if (self.hash[:DIFFICULTY] == '0' * DIFFICULTY):
+                break
+            self.nonce += 1
 
     @classmethod
     def mine_block(cls, last_block: 'Block', data: str):
-        timestamp = time.time_ns()
-        last_hash = last_block.hash
         nonce = 0
-        hash = Block.hash(timestamp=timestamp,
-                          last_hash=last_hash, data=data, nonce=nonce)
-        return cls(timestamp=timestamp, last_hash=last_hash, hash=hash, data=data, nonce=nonce)
+        block = cls(
+            nonce=nonce,
+            timestamp=time.time_ns(),
+            last_hash=last_block.hash,
+            hash='',
+            data=data,
+        )
+        block.mine()
+        return block
 
     @classmethod
     def hash(cls, **kwargs):
