@@ -41,3 +41,7 @@ class Block:
         m = hashlib.sha256()
         m.update(data.encode())
         return m.hexdigest()
+
+    def __eq__(self, block: 'Block'):
+        print(block)
+        return self.timestamp == block.timestamp and self.data == block.data and self.hash == block.hash and self.last_hash == block.last_hash
