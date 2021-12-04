@@ -22,6 +22,7 @@ async def post_mine(request: web.Request):
 
 
 sockets = []
+ports = []
 
 
 async def get_messages(ws: web.WebSocketResponse):
@@ -65,6 +66,7 @@ async def connectPeer(port):
         try:
             ws = await session.ws_connect('http://localhost:{port}/ws'.format(port=port))
         except:
+            ports.append(port)
             return
 
         sockets.append(ws)
@@ -88,26 +90,14 @@ def main():
     ])
     app.add_routes([])
 
-    # find available ports
-    for port in range(3000, 3010):
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            try:
-                s.bind(('localhost', port))
-            except socket.error as e:
-                if e.errno == errno.EADDRINUSE:
-                    continue
-                raise e
-            break
-    else:
-        raise Exception()
-
     loop = asyncio.get_event_loop()
 
     for peer_port in range(3000, 3010):
         loop.create_task(connectPeer(peer_port))
 
-    web.run_app(app, port=port)
-    exit()
+    loop.run_until_complete(asyncio.sleep(1))
+
+    web.run_app(app, port=min(ports))
 
 
 main()
