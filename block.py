@@ -43,5 +43,7 @@ class Block:
         return m.hexdigest()
 
     def __eq__(self, block: 'Block'):
-        print(block)
         return self.timestamp == block.timestamp and self.data == block.data and self.hash == block.hash and self.last_hash == block.last_hash
+
+    def get_hash(self):
+        return Block.hash(timestamp=self.timestamp, last_hash=self.last_hash, data=self.data)
