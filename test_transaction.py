@@ -9,7 +9,7 @@ def test_outputs_the_amount():
     recipient = 'rec'
 
     transaction = Transaction.newTransaction(
-        senderWallet=wallet, recipient=recipient, amount=50,
+        sender_wallet=wallet, recipient=recipient, amount=50,
     )
 
     record = list(
@@ -28,6 +28,29 @@ def test_exceed():
     wallet.balance = 500
     recipient = 'rec'
     transaction = Transaction.newTransaction(
-        senderWallet=wallet, recipient=recipient, amount=5000,
+        sender_wallet=wallet, recipient=recipient, amount=5000,
     )
     assert transaction is None
+
+
+def test_wallet_balance():
+    wallet = Wallet()
+    wallet.balance = 500
+    recipient = 'rec'
+
+    transaction = Transaction.newTransaction(
+        sender_wallet=wallet, recipient=recipient, amount=50,
+    )
+    assert transaction.input['amount'] == 500
+
+
+def test_the_balance_of_the_wallet():
+    wallet = Wallet()
+    wallet.balance = 500
+    recipient = 'rec'
+
+    transaction = Transaction.newTransaction(
+        sender_wallet=wallet, recipient=recipient, amount=50,
+    )
+
+    assert transaction.input['amount'] == wallet.balance

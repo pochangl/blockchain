@@ -1,8 +1,7 @@
 import hashlib
 import time
 from settings import DIFFICULTY, MINE_RATE
-
-hash = hashlib.sha256()
+import chain_util
 
 
 class Block:
@@ -65,9 +64,7 @@ class Block:
     def hash(cls, **kwargs):
         data = '{timestamp}{last_hash}{data}{nonce}{difficulty}'.format(
             **kwargs)
-        m = hashlib.sha256()
-        m.update(data.encode())
-        return m.hexdigest()
+        return chain_util.hash(data)
 
     def mine(self):
         while True:
